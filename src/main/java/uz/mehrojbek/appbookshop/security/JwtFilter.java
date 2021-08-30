@@ -19,7 +19,7 @@ public class JwtFilter extends OncePerRequestFilter {
     private final JwtProvider jwtProvider;
     private final AuthService authService;
 
-    public JwtFilter(JwtProvider jwtProvider,@Lazy AuthService authService) {
+    public JwtFilter(JwtProvider jwtProvider, AuthService authService) {
         this.jwtProvider = jwtProvider;
         this.authService = authService;
     }

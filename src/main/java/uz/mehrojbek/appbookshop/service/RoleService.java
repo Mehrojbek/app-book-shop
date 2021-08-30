@@ -1,15 +1,18 @@
 package uz.mehrojbek.appbookshop.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import uz.mehrojbek.appbookshop.entity.Role;
 import uz.mehrojbek.appbookshop.exception.RestException;
-import uz.mehrojbek.appbookshop.payload.ApiResult;
-import uz.mehrojbek.appbookshop.payload.RoleDto;
+import uz.mehrojbek.appbookshop.payload.*;
 import uz.mehrojbek.appbookshop.repository.RoleRepository;
 
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -17,13 +20,17 @@ public class RoleService {
     private final RoleRepository roleRepository;
 
 
-    public ApiResult<?> getAll(){
-        return ApiResult.successRespWithData(roleRepository.findAll());
+    public ApiResult<CustPage<RoleResp>> getAll(int page, int size){
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Role> rolePage = roleRepository.findAll(pageable);
+        CustPage<RoleResp> custPage = custPageBuilder(rolePage);
+        custPage.setContent(rolePage.getContent().stream().map(this::roleRespBuilder).collect(Collectors.toList()));
+        return ApiResult.successRespWithData(custPage);
     }
 
-    public ApiResult<Role> getOne(UUID id){
+    public ApiResult<RoleResp> getOne(UUID id){
         Role role = roleRepository.findById(id).orElseThrow(() -> new RestException("role topilmadi", HttpStatus.NOT_FOUND));
-        return ApiResult.successRespWithData(role);
+        return ApiResult.successRespWithData(roleRespBuilder(role));
     }
 
     public ApiResult<?> add(RoleDto roleDto){
@@ -64,5 +71,27 @@ public class RoleService {
         role.setPermissionEnums(roleDto.getPermissionEnums());
         roleRepository.save(role);
         return ApiResult.successResponse("role o'zgartirildi");
+    }
+
+    private CustPage<RoleResp> custPageBuilder(Page<Role> page){
+        return new CustPage<>(
+                page.getNumber(),
+                page.getNumberOfElements(),
+                page.getSize(),
+                page.getSort(),
+                page.getTotalPages(),
+                page.getTotalElements(),
+                page.getPageable()
+        );
+    }
+
+    private RoleResp roleRespBuilder(Role role){
+        return new RoleResp(
+                role.getId(),
+                role.getName(),
+                role.getDescription(),
+                role.getType(),
+                role.getPermissionEnums()
+        );
     }
 }

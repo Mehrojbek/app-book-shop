@@ -47,7 +47,7 @@ public class JwtProvider {
 
 
     private Date convertToDateViaInstant(LocalDateTime dateToConvert) {
-        return java.util.Date.from(dateToConvert.atZone(ZoneId.of("Africa/Tashkent"))
+        return java.util.Date.from(dateToConvert.atZone(ZoneId.of("Asia/Tashkent"))
                         .toInstant());
     }
 }

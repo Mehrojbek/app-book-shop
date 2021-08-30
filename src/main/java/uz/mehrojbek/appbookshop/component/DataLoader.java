@@ -3,11 +3,14 @@ package uz.mehrojbek.appbookshop.component;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import uz.mehrojbek.appbookshop.entity.User;
 import uz.mehrojbek.appbookshop.repository.RoleRepository;
 import uz.mehrojbek.appbookshop.entity.Role;
 import uz.mehrojbek.appbookshop.enums.PermissionEnum;
 import uz.mehrojbek.appbookshop.enums.RoleTypeEnum;
+import uz.mehrojbek.appbookshop.repository.UserRepository;
 
 import java.util.Arrays;
 
@@ -17,8 +20,10 @@ import static uz.mehrojbek.appbookshop.enums.PermissionEnum.*;
 @RequiredArgsConstructor
 public class DataLoader implements CommandLineRunner {
     private final RoleRepository roleRepository;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    @Value("${sql.init.mode}")
+    @Value("${spring.sql.init.mode}")
     private String initMode;
 
     @Override
@@ -35,10 +40,29 @@ public class DataLoader implements CommandLineRunner {
                         role.setPermissionEnums(Arrays.asList(PermissionEnum.values()));
                         break;
                     case OPERATOR:
-                        role.setPermissionEnums(Arrays.asList(VIEW_ORDER,ADD_ORDER,EDIT_ORDER,DELETE_ORDER));
+                        role.setPermissionEnums(Arrays.asList(VIEW_CLIENT,ADD_CLIENT,EDIT_CLIENT));
                 }
                 roleRepository.save(role);
             }
+            //add oper, admin user
+            userRepository.save(
+                    new User(
+                            "admin",
+                            "admin",
+                            passwordEncoder.encode("admin123"),
+                            roleRepository.getByType(RoleTypeEnum.ADMIN),
+                            true
+                    )
+            );
+            userRepository.save(
+                    new User(
+                            "operator",
+                            "operator",
+                            passwordEncoder.encode( "oper123"),
+                            roleRepository.getByType(RoleTypeEnum.OPERATOR),
+                            true
+                    )
+            );
         }
     }
 }

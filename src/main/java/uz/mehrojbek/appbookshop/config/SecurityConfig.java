@@ -1,6 +1,5 @@
 package uz.mehrojbek.appbookshop.config;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.AuditorAware;
@@ -8,21 +7,28 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import uz.mehrojbek.appbookshop.security.JwtFilter;
 import uz.mehrojbek.appbookshop.service.AuthService;
 
 import java.util.UUID;
 
 @Configuration
 @EnableWebSecurity
-@RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final AuthService authService;
+    private final JwtFilter jwtFilter;
+
+    public SecurityConfig(AuthService authService, JwtFilter jwtFilter) {
+        this.authService = authService;
+        this.jwtFilter = jwtFilter;
+    }
+
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -61,9 +67,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/csrf",
                         "/webjars/")
                 .permitAll()
-                .antMatchers(HttpMethod.GET)
+                .antMatchers(HttpMethod.GET,"nimadir")
                 .permitAll()
-                .antMatchers(HttpMethod.POST)
+                .antMatchers(HttpMethod.POST,
+                        "/api/auth/**"
+                )
                 .permitAll()
                 .antMatchers("/v2/api-docs",
                         "/configuration/ui"
@@ -71,6 +79,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .permitAll()
                 .antMatchers("/api/**")
                 .authenticated();
+        http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
     }
 
     @Bean

@@ -1,7 +1,7 @@
 package uz.mehrojbek.appbookshop.enums;
 
 public enum RegionEnum {
-    TASHKENT,
+    TASHKENT_V,
     JIZZAX,
     SIRDARYO,
     GULISTON,

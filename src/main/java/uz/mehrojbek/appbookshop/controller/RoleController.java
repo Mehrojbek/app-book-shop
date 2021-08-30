@@ -4,10 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import uz.mehrojbek.appbookshop.component.UserChecker;
 import uz.mehrojbek.appbookshop.payload.ApiResult;
+import uz.mehrojbek.appbookshop.payload.CustPage;
 import uz.mehrojbek.appbookshop.payload.RoleDto;
+import uz.mehrojbek.appbookshop.payload.RoleResp;
 import uz.mehrojbek.appbookshop.service.RoleService;
 import uz.mehrojbek.appbookshop.utils.RestConstants;
-
 import java.util.UUID;
 
 import static uz.mehrojbek.appbookshop.enums.PermissionEnum.ADD_ROLE;
@@ -21,12 +22,13 @@ public class RoleController {
 
 
     @GetMapping
-    public ApiResult<?> getAll(){
-        return roleService.getAll();
+    public ApiResult<CustPage<RoleResp>> getAll(@RequestParam(defaultValue = RestConstants.DEFAULT_PAGE) int page,
+                                                @RequestParam(defaultValue = RestConstants.DEFAULT_SIZE) int size){
+        return roleService.getAll(page,size);
     }
 
     @GetMapping("/{id}")
-    public ApiResult<?> getAll(@PathVariable UUID id){
+    public ApiResult<RoleResp> getOne(@PathVariable UUID id){
         return roleService.getOne(id);
     }
 
@@ -40,6 +42,7 @@ public class RoleController {
     public ApiResult<?> delete(@PathVariable UUID id){
         return roleService.delete(id);
     }
+
 
     @PutMapping("/{id}")
     public ApiResult<?> edit(@PathVariable UUID id, @RequestBody RoleDto roleDto){

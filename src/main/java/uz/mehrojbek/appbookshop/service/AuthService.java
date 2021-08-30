@@ -1,6 +1,6 @@
 package uz.mehrojbek.appbookshop.service;
 
-import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -16,14 +16,20 @@ import uz.mehrojbek.appbookshop.payload.LoginDto;
 import uz.mehrojbek.appbookshop.repository.UserRepository;
 import uz.mehrojbek.appbookshop.security.JwtProvider;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor
 public class AuthService implements UserDetailsService {
     private final UserRepository userRepository;
     private final AuthenticationManager authenticationManager;
     private final JwtProvider jwtProvider;
+
+    public AuthService(UserRepository userRepository, @Lazy AuthenticationManager authenticationManager, @Lazy JwtProvider jwtProvider) {
+        this.userRepository = userRepository;
+        this.authenticationManager = authenticationManager;
+        this.jwtProvider = jwtProvider;
+    }
 
     public ApiResult<?> login(LoginDto loginDto) {
         try {
@@ -39,7 +45,8 @@ public class AuthService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
-        return userRepository.findByUsername(s).orElseThrow(() -> new RestException("login yoki parol xato", HttpStatus.UNAUTHORIZED));
+        Optional<User> optionalUser = userRepository.findByUsername(s);
+        return optionalUser.orElseThrow(() -> new RestException("login yoki parol xato", HttpStatus.UNAUTHORIZED));
     }
 
     public UserDetails loadUserById(String s) throws UsernameNotFoundException {

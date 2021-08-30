@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import uz.mehrojbek.appbookshop.entity.template.AbsEntity;
+import uz.mehrojbek.appbookshop.enums.ProductEnum;
 import uz.mehrojbek.appbookshop.enums.RegionEnum;
 
 import javax.persistence.*;
@@ -25,8 +26,11 @@ public class Client extends AbsEntity {
     @Enumerated(EnumType.STRING)
     private RegionEnum region;
 
-    @OneToMany(mappedBy = "client",cascade = CascadeType.ALL)
-    private List<Order> orderList;
+    @Enumerated(EnumType.STRING)
+    @ElementCollection
+    private List<ProductEnum> productList;
+
+    private boolean buy;
 
     public Client(String fullName, String phoneNumber, RegionEnum region) {
         this.fullName = fullName;

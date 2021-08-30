@@ -5,4 +5,6 @@ public interface RestConstants {
     String ROLE_CONTROLLER = "/api/role";
     String USER_CONTROLLER = "/api/user";
     String CLIENT_CONTROLLER = "/api/client";
+    String DEFAULT_PAGE = "0";
+    String DEFAULT_SIZE = "10";
 }

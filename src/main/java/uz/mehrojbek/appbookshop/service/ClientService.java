@@ -4,17 +4,17 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import uz.mehrojbek.appbookshop.entity.Client;
-import uz.mehrojbek.appbookshop.entity.Order;
+import uz.mehrojbek.appbookshop.exception.RestException;
 import uz.mehrojbek.appbookshop.payload.ApiResult;
 import uz.mehrojbek.appbookshop.payload.ClientDto;
 import uz.mehrojbek.appbookshop.payload.CustPage;
-import uz.mehrojbek.appbookshop.payload.OrderDto;
 import uz.mehrojbek.appbookshop.repository.ClientRepository;
 import uz.mehrojbek.appbookshop.utils.CommonUtils;
 
-import java.util.Objects;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,13 +30,49 @@ public class ClientService {
         return ApiResult.successRespWithData(custPage);
     }
 
+    public ApiResult<ClientDto> getOne(UUID id){
+        Client client = clientRepository.findById(id).orElseThrow(() -> new RestException("Client topilmadi", HttpStatus.NOT_FOUND));
+        return ApiResult.successRespWithData(clientDtoBuilder(client));
+    }
+
     public ApiResult<?> add(ClientDto clientDto){
-        Client client = new Client(
-                clientDto.getFullName(),
-                clientDto.getPhoneNumber(),
-                clientDto.getRegion()
-        );
-//        Order order = new Order(client,)
+        try {
+            Client client = new Client(
+                    clientDto.getFullName(),
+                    clientDto.getPhoneNumber(),
+                    clientDto.getRegion(),
+                    clientDto.getProductList(),
+                    false
+            );
+            clientRepository.save(client);
+            return ApiResult.successResponse("buyurtma saqlandi");
+        }catch (Exception e){
+            throw new RestException(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public ApiResult<?> delete(UUID id){
+        try {
+            clientRepository.deleteById(id);
+            return ApiResult.successResponse("client deleted");
+        }catch (Exception e){
+            throw new RestException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public ApiResult<?> edit(UUID id, ClientDto clientDto){
+        try {
+            Client client = clientRepository.findById(id).orElseThrow(() -> new RestException("client topilmadi", HttpStatus.NOT_FOUND));
+            client.setFullName(clientDto.getFullName());
+            client.setPhoneNumber(clientDto.getPhoneNumber());
+            client.setRegion(clientDto.getRegion());
+            client.setProductList(clientDto.getProductList());
+            client.setBuy(clientDto.isBuy());
+            clientRepository.save(client);
+            return ApiResult.successResponse("client tahrirlandi");
+        }catch (Exception e){
+            throw new RestException("clientni tahrirlashda xatolik : "+e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
 
@@ -48,16 +84,11 @@ public class ClientService {
                 client.getFullName(),
                 client.getPhoneNumber(),
                 client.getRegion(),
-                !Objects.isNull(client.getOrderList()) ? client.getOrderList().stream().map(this::orderDtoBuilder).collect(Collectors.toList()) : null
+                client.getProductList(),
+                client.isBuy()
         );
     }
 
-    private OrderDto orderDtoBuilder(Order order){
-        return new OrderDto(
-                order.getId(),
-                order.getProductList()
-        );
-    }
 
     private CustPage<ClientDto> custPageBuilder(Page<Client> page){
         return new CustPage<>(

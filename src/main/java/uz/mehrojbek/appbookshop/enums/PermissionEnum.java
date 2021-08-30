@@ -6,8 +6,13 @@ public enum PermissionEnum {
     EDIT_ROLE,
     DELETE_ROLE,
 
-    VIEW_ORDER,
-    ADD_ORDER,
-    EDIT_ORDER,
-    DELETE_ORDER
+    VIEW_CLIENT,
+    ADD_CLIENT,
+    EDIT_CLIENT,
+    DELETE_CLIENT,
+
+    VIEW_USER,
+    ADD_USER,
+    EDIT_USER,
+    DELETE_USER
 }

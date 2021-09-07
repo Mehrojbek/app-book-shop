@@ -15,7 +15,7 @@ public class RoleDto {
 
     private String description;
 
-    @ApiModelProperty(example = "ADMIN, MODER, OPERATOR, CUSTOM")
+    @ApiModelProperty(example = "ADMIN, OPERATOR, CUSTOM(adminni o'zi yaratgan role)")
     private RoleTypeEnum type;
 
     @ApiModelProperty(example = "[VIEW_ROLE,ADD_ROLE,EDIT_ROLE,DELETE_ROLE,VIEW_ORDER,ADD_ORDER,EDIT_ORDER,DELETE_ORDER,VIEW_USER,ADD_USER,EDIT_USER,DELETE_USER]")

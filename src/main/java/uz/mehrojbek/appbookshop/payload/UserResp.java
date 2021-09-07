@@ -3,7 +3,6 @@ package uz.mehrojbek.appbookshop.payload;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import uz.mehrojbek.appbookshop.entity.Role;
 
 import java.util.UUID;
 

@@ -46,11 +46,9 @@ public class UserController {
 
     @PutMapping("/{id}")
     public ApiResult<?> edit(@PathVariable UUID id, @RequestBody UserDto userDto) {
-        if (userChecker.getUser().getId().equals(id)) {
-            return userService.edit(id, userDto);
-        } else {
+        if (!userChecker.getUser().getId().equals(id)) {
             userChecker.hasPermission(PermissionEnum.EDIT_USER);
-            return userService.edit(id, userDto);
         }
+        return userService.edit(id, userDto);
     }
 }

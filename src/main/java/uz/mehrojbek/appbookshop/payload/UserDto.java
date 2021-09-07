@@ -10,7 +10,7 @@ public class UserDto {
     @ApiModelProperty(example = "G'anivoy G'aniyev")
     private String fullName;
 
-    @ApiModelProperty(example = "gani1200")
+    @ApiModelProperty(example = "g'ani1200")
     private String username;
 
     private String password;
